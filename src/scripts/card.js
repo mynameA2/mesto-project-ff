@@ -1,3 +1,5 @@
+import { openModal } from "./modal";
+
 const template = document.querySelector('#card-template');
 const popupZoom = document.querySelector('.popup_type_image');
 const popupImage = document.querySelector('.popup__image');
@@ -9,19 +11,18 @@ function createCard(cardData, deleteCallback, likeClick) {
     const cardImage = cardHtml.querySelector('.card__image');
     cardImage.src = cardData.link;
     cardImage.addEventListener('click', () => {
-        popupZoom.classList.add('popup_is-opened', 'popup_is-animated');
+        openModal(popupZoom);
+        popupImage.alt = cardData.name;
         popupImage.src = cardData.link;
     });
     cardHtml.querySelector('.card__image').alt = cardData.name;
     cardHtml.querySelector('.card__delete-button').addEventListener('click',() => { deleteCallback(cardHtml);
     }) 
     // лайк
-    const likeButtons = document.querySelectorAll('.card__like-button');
-    likeButtons.forEach((button) => {
-        button.addEventListener('click', () => {
-            button.classList.toggle('card__like-button_is-active');
+    const likeButton = cardHtml.querySelector('.card__like-button');
+    likeButton.addEventListener('click', () => {
+        likeButton.classList.toggle('card__like-button_is-active');
         });
-    });
 return cardHtml;
 };
 
