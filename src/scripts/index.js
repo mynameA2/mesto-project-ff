@@ -24,7 +24,12 @@ const popupContents = document.querySelectorAll(".popup__content");
 
 // @todo: Вывести карточки на страницу
 initialCards.forEach((cardData) => {
-  const cardHtml = createCard(cardData, deleteCard, likeClick, handleImageClick);
+  const cardHtml = createCard(
+    cardData,
+    deleteCard,
+    likeClick,
+    handleImageClick
+  );
   list.append(cardHtml);
 });
 // закрытие попапа через кнопку
@@ -56,8 +61,12 @@ function handleAddCardFormSubmit(evt) {
   evt.preventDefault();
   const newCard = createCard(
     { name: placeNameInput.value, link: linkInput.value },
-    deleteCard
+    deleteCard,
+    likeClick,
+    handleImageClick
   );
+
+  list.append(newCard);
   conteinerCards.prepend(newCard);
   closeModal();
   // Очистка инпутов:
@@ -67,10 +76,11 @@ function handleAddCardFormSubmit(evt) {
 formAddCard.addEventListener("submit", handleAddCardFormSubmit);
 
 // попап редактирования профиля
-editButton.addEventListener("click", () => 
-    openModal(popupEdit),
-    (nameInput.value = profileName.textContent),
-    (jobInput.value = profileJob.textContent)
+editButton.addEventListener(
+  "click",
+  () => openModal(popupEdit),
+  (nameInput.value = profileName.textContent),
+  (jobInput.value = profileJob.textContent)
 );
 // попад добавления карточки
 addCardButton.addEventListener("click", () => openModal(popupAddCard));
