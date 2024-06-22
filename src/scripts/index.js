@@ -1,11 +1,9 @@
 import "../pages/index.css";
 import { initialCards } from "./cards.js";
 import { openModal, closeModal, closeEsc } from "./modal.js";
-import { createCard, deleteCard, likeClick, handleImageClick } from "./card.js";
+import { createCard, deleteCard, likeClick } from "./card.js";
 
 const list = document.querySelector(".places__list");
-const sectionElementPlaces = document.querySelector(".places");
-const conteinerCards = sectionElementPlaces.querySelector(".places__list");
 const popupCloseButtons = document.querySelectorAll(".popup__close");
 const profileForm = document.querySelector("#edit-profile");
 const nameInput = document.querySelector("#name");
@@ -21,6 +19,9 @@ const addCardButton = document.querySelector(".profile__add-button");
 const popupAddCard = document.querySelector(".popup_type_new-card");
 const popups = document.querySelectorAll(".popup");
 const popupContents = document.querySelectorAll(".popup__content");
+const popupZoom = document.querySelector(".popup_type_image");
+const popupImage = document.querySelector(".popup__image");
+const popupCaption = document.querySelector(".popup__caption");
 
 // @todo: Вывести карточки на страницу
 initialCards.forEach((cardData) => {
@@ -34,7 +35,7 @@ initialCards.forEach((cardData) => {
 });
 // закрытие попапа через кнопку
 popupCloseButtons.forEach((item) => {
-  item.addEventListener("mousedown", closeModal);
+  item.addEventListener("click", closeModal);
 });
 
 // закрытие попапа через overlay
@@ -66,8 +67,7 @@ function handleAddCardFormSubmit(evt) {
     handleImageClick
   );
 
-  list.append(newCard);
-  conteinerCards.prepend(newCard);
+  list.prepend(newCard);
   closeModal();
   // Очистка инпутов:
   placeNameInput.value = ""; // Очистка имени места
@@ -75,12 +75,18 @@ function handleAddCardFormSubmit(evt) {
 }
 formAddCard.addEventListener("submit", handleAddCardFormSubmit);
 
+function handleImageClick(cardData) {
+  openModal(popupZoom);
+  popupImage.alt = cardData.name;
+  popupImage.src = cardData.link;
+  popupCaption.textContent = cardData.name;
+}
+
 // попап редактирования профиля
-editButton.addEventListener(
-  "click",
-  () => openModal(popupEdit),
-  (nameInput.value = profileName.textContent),
-  (jobInput.value = profileJob.textContent)
-);
+editButton.addEventListener("click", () => {
+  openModal(popupEdit);
+  nameInput.value = profileName.textContent;
+  jobInput.value = profileJob.textContent;
+});
 // попад добавления карточки
 addCardButton.addEventListener("click", () => openModal(popupAddCard));
