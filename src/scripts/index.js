@@ -66,7 +66,7 @@ const profileInfo = (userInfo) => {
 };
 
 const waitLoading = (thisLoading, popupButton) => {
-    popupButton.textContent = thisLoading ? "Сохранение..." : "Сохранить";
+  popupButton.textContent = thisLoading ? "Сохранение..." : "Сохранить";
 };
 function handleProfileFormSubmit(evt) {
   evt.preventDefault();
@@ -88,19 +88,18 @@ profileForm.addEventListener("submit", handleProfileFormSubmit);
 
 // добавление карточки
 
-getInitialCards((initialCards, userId)  => {
-    initialCards.forEach((card) => {
-        createCard(newCard, userId, deleteCard, likeClick,  handleImageClick);
-    });
+getInitialCards((initialCards, userId) => {
+  initialCards.forEach((newCard) => {
+    createCard(newCard, userId, deleteCard, likeClick, handleImageClick);
   });
+});
 
 function handleAddCardFormSubmit(evt) {
   evt.preventDefault();
   waitLoading(true, popupButton);
   const name = placeNameInput.value;
   const link = linkInput.value;
-  addCard({ name, link })
-  .then((newCard) => {
+  addCard({ name, link }).then((newCard) => {
     createCard(
       newCard,
       userID,
@@ -114,11 +113,7 @@ function handleAddCardFormSubmit(evt) {
   closeModal(popupAddCard);
   formAddCard.reset(popupAddCard);
   clearValidation(popupAddCard, validationConfig);
-  waitLoading(false, popupButton); 
- 
-  // Очистка инпутов:
-//   placeNameInput.value = "";
-//   linkInput.value = "";
+  waitLoading(false, popupButton);
 }
 formAddCard.addEventListener("submit", handleAddCardFormSubmit);
 
@@ -138,6 +133,7 @@ editButton.addEventListener("click", () => {
 // попад добавления карточки
 addCardButton.addEventListener("click", () => {
   openModal(popupAddCard);
+  clearValidation(popupAddCard, validationConfig);
 });
 
 // валидация
@@ -146,10 +142,12 @@ enableValidation(validationConfig);
 // изменение аватара
 function handleEditAvatarFormSubmit(evt) {
   evt.preventDefault();
+  waitLoading(true, popupButton);
   editAvatar(popupAvatarForm.link.value).then((userInfo) => {
     profileInfo(userInfo);
     closeModal(popupAvatar);
     clearValidation(popupAvatarForm, validationConfig);
+    waitLoading(false, popupButton);
   });
 }
 popupAvatarForm.addEventListener("submit", handleEditAvatarFormSubmit);
@@ -163,7 +161,6 @@ avatarEditButton.addEventListener("click", (evt) => {
 // инициализация
 Promise.all([getUserInfo(), getInitialCards()]).then(([user, cards]) => {
   const userID = user._id;
-  //   handleGetUserInfo(user);
   cards.forEach((cardData) => {
     const cardHtml = createCard(
       cardData,
@@ -179,7 +176,7 @@ Promise.all([getUserInfo(), getInitialCards()]).then(([user, cards]) => {
 getInitialInfo()
   .then((result) => {
     const userInfo = result[0];
-    userID = userInfo._id;
+    userID = userInfo;
     const initialCards = result[1];
     profileInfo(userInfo);
     getInitialCards(initialCards, userID);
