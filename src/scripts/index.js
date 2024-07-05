@@ -40,7 +40,7 @@ const popupCaption = document.querySelector(".popup__caption");
 const popupAvatar = document.querySelector(".popup_type_avatar");
 const popupAvatarForm = document.forms["edit-avatar"];
 const avatarEditButton = document.querySelector(".profile__image-container");
-const userID = localStorage.getItem("userID");
+let userID = localStorage.getItem("userID");
 
 // закрытие попапа через кнопку
 popupCloseButtons.forEach((item) => {
@@ -175,8 +175,9 @@ Promise.all([getUserInfo(), getInitialCards()]).then(([user, cards]) => {
 
 getInitialInfo()
   .then((result) => {
+    
     const userInfo = result[0];
-    userID = userInfo;
+    userID = userInfo._id;
     const initialCards = result[1];
     profileInfo(userInfo);
     getInitialCards(initialCards, userID);

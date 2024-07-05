@@ -1,5 +1,4 @@
 import { data } from "autoprefixer";
-console.log(data);
 const configSet = {
   baseUrl: "https://nomoreparties.co/v1/wff-cohort-17",
   headers: {
