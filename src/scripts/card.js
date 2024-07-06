@@ -1,8 +1,13 @@
-import { openModal } from "./modal";
 import { likeCard, dislikeCard } from "./api";
 
 const template = document.querySelector("#card-template");
-function createCard(cardData, deleteCallback, likeClick, handleImageClick, userID) {
+function createCard(
+  cardData,
+  deleteCallback,
+  likeClick,
+  handleImageClick,
+  userID
+) {
   const cardHtml = template.content.firstElementChild.cloneNode(true);
   const cardTitle = cardHtml.querySelector(".card__title");
   const cardImage = cardHtml.querySelector(".card__image");
@@ -19,13 +24,12 @@ function createCard(cardData, deleteCallback, likeClick, handleImageClick, userI
 
   const isLiked = cardData.likes.some((like) => like._id === userID);
 
-//   проверка на лайк
+  //   проверка на лайк
   if (isLiked) {
     likeButton.classList.add("card__like-button_is-active");
-  }else{
-    likeButton.classList.remove("card__like-button_is-active"); 
+  } else {
+    likeButton.classList.remove("card__like-button_is-active");
   }
-
 
   cardImage.addEventListener("click", () => {
     handleImageClick(cardData);
@@ -46,13 +50,20 @@ function deleteCard(card) {
 
 function likeClick(likeButton, cardId, likeCounter) {
   if (likeButton.classList.contains("card__like-button_is-active")) {
-    dislikeCard(cardId);
-    likeCounter.textContent = Number(likeCounter.textContent) - 1
+    dislikeCard(cardId)
+      .then((updateCard) => {
+        likeButton.classList.remove("card__like-button_is-active");
+        likeCounter.textContent = updateCard.likes.length;
+      })
+      .catch((err) => console.log(err));
   } else {
-    likeCard(cardId);
-    likeCounter.textContent = Number(likeCounter.textContent) + 1
+    likeCard(cardId)
+      .then((updateCard) => {
+        likeButton.classList.add("card__like-button_is-active");
+        likeCounter.textContent = updateCard.likes.length;
+      })
+      .catch((err) => console.log(err));
   }
 }
-
 
 export { createCard, deleteCard, likeClick };

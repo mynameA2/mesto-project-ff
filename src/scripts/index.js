@@ -2,11 +2,7 @@ import "../pages/index.css";
 import { initialCards } from "./cards.js";
 import { openModal, closeModal, closeEsc } from "./modal.js";
 import { createCard, deleteCard, likeClick } from "./card.js";
-import {
-  enableValidation,
-  clearValidation,
-  validationConfig,
-} from "./validation.js";
+import { enableValidation, clearValidation } from "./validation.js";
 import {
   getUserInfo,
   getInitialCards,
@@ -40,7 +36,21 @@ const popupCaption = document.querySelector(".popup__caption");
 const popupAvatar = document.querySelector(".popup_type_avatar");
 const popupAvatarForm = document.forms["edit-avatar"];
 const avatarEditButton = document.querySelector(".profile__image-container");
-let userID = localStorage.getItem("userID");
+// let userID = localStorage.getItem("userID");
+let userID = "";
+export const validationConfig = {
+  formSelector: ".popup__form",
+  inputSelector: ".popup__input",
+  submitButtonSelector: ".popup__button",
+  inactiveButtonClass: "popup__button_disabled",
+  inputErrorClass: "form__input_type_error",
+  errorClass: "form__input_type_error_active",
+};
+
+// добавим анимации в попап
+if (!document.querySelector(".popup").classList.contains("popup_is-animated")) {
+  document.querySelector(".popup").classList.add("popup_is-animated");
+}
 
 // закрытие попапа через кнопку
 popupCloseButtons.forEach((item) => {
@@ -56,9 +66,13 @@ popupContents.forEach((item) => {
     evt.stopPropagation();
   });
 });
-
+// попап редактирования профиля
+editButton.addEventListener("click", () => {
+  (nameInput.value = profileName.textContent),
+    (jobInput.value = profileJob.textContent),
+    openModal(popupEdit);
+});
 // редактирование профиля
-// принимает данные но выводит стандартное значение
 const profileInfo = (userInfo) => {
   profileName.textContent = userInfo.name;
   profileJob.textContent = userInfo.about;
@@ -86,79 +100,15 @@ function handleProfileFormSubmit(evt) {
 }
 profileForm.addEventListener("submit", handleProfileFormSubmit);
 
-// добавление карточки
-
-getInitialCards((initialCards, userId) => {
-  initialCards.forEach((newCard) => {
-    createCard(newCard, userId, deleteCard, likeClick, handleImageClick);
-  });
-});
-
-function handleAddCardFormSubmit(evt) {
-  evt.preventDefault();
-  waitLoading(true, popupButton);
-  const name = placeNameInput.value;
-  const link = linkInput.value;
-  addCard({ name, link }).then((newCard) => {
-    createCard(
-      newCard,
-      userID,
-      deleteCard,
-      likeClick,
-      handleImageClick,
-      list.prepend(newCard)
-    );
-  });
-
-  closeModal(popupAddCard);
-  formAddCard.reset(popupAddCard);
-  clearValidation(popupAddCard, validationConfig);
-  waitLoading(false, popupButton);
-}
-formAddCard.addEventListener("submit", handleAddCardFormSubmit);
-
-function handleImageClick(cardData) {
-  openModal(popupZoom);
-  popupImage.alt = cardData.name;
-  popupImage.src = cardData.link;
-  popupCaption.textContent = cardData.name;
-}
-
-// попап редактирования профиля
-editButton.addEventListener("click", () => {
-  (nameInput.value = profileName.textContent),
-    (jobInput.value = profileJob.textContent),
-    openModal(popupEdit);
-});
 // попад добавления карточки
 addCardButton.addEventListener("click", () => {
   openModal(popupAddCard);
-  clearValidation(popupAddCard, validationConfig);
+  placeNameInput.value = "";
+  linkInput.value = "";
 });
 
-// валидация
-enableValidation(validationConfig);
+// добавление карточки
 
-// изменение аватара
-function handleEditAvatarFormSubmit(evt) {
-  evt.preventDefault();
-  waitLoading(true, popupButton);
-  editAvatar(popupAvatarForm.link.value).then((userInfo) => {
-    profileInfo(userInfo);
-    closeModal(popupAvatar);
-    clearValidation(popupAvatarForm, validationConfig);
-    waitLoading(false, popupButton);
-  });
-}
-popupAvatarForm.addEventListener("submit", handleEditAvatarFormSubmit);
-avatarEditButton.addEventListener("click", (evt) => {
-  evt.preventDefault();
-  openModal(popupAvatar);
-  popupAvatarForm.reset();
-  clearValidation(popupAvatarForm, validationConfig);
-});
-
-// инициализация
 Promise.all([getUserInfo(), getInitialCards()]).then(([user, cards]) => {
   const userID = user._id;
   cards.forEach((cardData) => {
@@ -171,13 +121,81 @@ Promise.all([getUserInfo(), getInitialCards()]).then(([user, cards]) => {
     );
     list.append(cardHtml);
   });
+})
+  .catch((err)=>{            
+  console.log(err);
+   }) 
+// getInitialCards((initialCards, userId) => {
+//   initialCards.forEach((newCard) => {
+//     createCard(newCard, userId, deleteCard, likeClick, handleImageClick);
+//   });
+// });
+
+function handleAddCardFormSubmit(evt) {
+  evt.preventDefault();
+  waitLoading(true, popupButton);
+  const name = placeNameInput.value;
+  const link = linkInput.value;
+  try {
+    addCard({ name, link }).then((newCard) => {
+      createCard(
+        newCard,
+        userID,
+        deleteCard,
+        likeClick,
+        handleImageClick,
+        list.prepend(newCard)
+      );
+      closeModal(popupAddCard);
+      formAddCard.reset(popupAddCard);
+      clearValidation(popupAddCard, validationConfig);
+    });
+  } catch (err) {
+    console.log(err);
+  } finally {
+    waitLoading(false, popupButton);
+  }
+}
+formAddCard.addEventListener("submit", handleAddCardFormSubmit);
+
+function handleImageClick(cardData) {
+  openModal(popupZoom);
+  popupImage.alt = cardData.name;
+  popupImage.src = cardData.link;
+  popupCaption.textContent = cardData.name;
+}
+
+// валидация
+enableValidation(validationConfig);
+
+// изменение аватара
+function handleEditAvatarFormSubmit(evt) {
+  evt.preventDefault();
+  try {
+    waitLoading(true, popupButton);
+    editAvatar(popupAvatarForm.link.value).then((userInfo) => {
+      profileInfo(userInfo);
+      closeModal(popupAvatar);
+      clearValidation(popupAvatarForm, validationConfig);
+    });
+  } catch (err) {
+    console.log(err);
+  } finally {
+    waitLoading(false, popupButton);
+  }
+}
+popupAvatarForm.addEventListener("submit", handleEditAvatarFormSubmit);
+avatarEditButton.addEventListener("click", (evt) => {
+  evt.preventDefault();
+  openModal(popupAvatar);
+  popupAvatarForm.reset();
 });
 
+// инициализация
 getInitialInfo()
   .then((result) => {
-    
     const userInfo = result[0];
-    userID = userInfo._id;
+    const userID = userInfo._id;
     const initialCards = result[1];
     profileInfo(userInfo);
     getInitialCards(initialCards, userID);

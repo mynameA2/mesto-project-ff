@@ -34,10 +34,7 @@ const checkTheResponse = (res) => {
     method: "GET",
     headers: configSet.headers,
   })
-  .then((res) => checkTheResponse(res))
-    .catch((err) => {
-      console.log(err);
-    });
+  .then((res) => checkTheResponse(res));
 }
 
 const getInitialInfo = () => {
@@ -54,10 +51,7 @@ const getInitialInfo = () => {
       about: userProfileData.about,
     }),
   })
-    .then((res) => checkTheResponse(res))
-    .catch((err) => {
-      console.log(err);
-    });
+    .then((res) => checkTheResponse(res));
 }
 
 // добавление карточки
@@ -70,10 +64,7 @@ const getInitialInfo = () => {
       link: cardData.link,
     }),
   })
-    .then((res) => checkTheResponse(res))
-    .catch((err) => {
-      console.log(err);
-    });
+    .then((res) => checkTheResponse(res));
 }
 
 // лайк карточки
@@ -82,10 +73,7 @@ const getInitialInfo = () => {
     method: "PUT",
     headers: configSet.headers,
   })
-    .then((res) => checkTheResponse(res))
-    .catch((err) => {
-      console.log(err);
-    });
+    .then((res) => checkTheResponse(res));
 }
 
 // дизлайк карточки
@@ -94,10 +82,7 @@ const getInitialInfo = () => {
     method: "DELETE",
     headers: configSet.headers,
   })
-    .then((res) => checkTheResponse(res))
-    .catch((err) => {
-      console.log(err);
-    });
+    .then((res) => checkTheResponse(res));
 }
 
 //   загрузка аватара
@@ -109,10 +94,7 @@ const getInitialInfo = () => {
       avatar: link,
     }),
   })
-    .then((res) => checkTheResponse(res))
-    .catch((err) => {
-      console.log(err);
-    });
+    .then((res) => checkTheResponse(res));
 }
 
 export {
