@@ -1,4 +1,3 @@
-import { validationConfig } from "./index";
 const showError = (
   formElement,
   inputElement,
@@ -35,12 +34,9 @@ const checkInputValidity = (formElement, inputElement, validationConfig) => {
   }
 };
 
-  function toggleButton(formElement) {
+  function toggleButton(formElement, buttonElement, validationConfig) {
     const inputList = Array.from(
       formElement.querySelectorAll(validationConfig.inputSelector)
-    );
-    const buttonElement = formElement.querySelector(
-      validationConfig.submitButtonSelector
     );
     const hasInvalid = inputList.some(
       (inputElement) => !inputElement.validity.valid
@@ -62,6 +58,7 @@ function setEventListeners(formElement, validationConfig) {
   const buttonElement = formElement.querySelector(
     validationConfig.submitButtonSelector
   );
+  buttonElement.classList.add(validationConfig.inactiveButtonClass);
   inputList.forEach((inputElement) => {
     inputElement.addEventListener("input", (evt) => {
       checkInputValidity(formElement, inputElement, validationConfig);

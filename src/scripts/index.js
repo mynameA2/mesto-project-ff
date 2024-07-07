@@ -6,7 +6,6 @@ import { enableValidation, clearValidation } from "./validation.js";
 import {
   getUserInfo,
   getInitialCards,
-  getInitialInfo,
   editProfile,
   addCard,
   editAvatar,
@@ -38,7 +37,7 @@ const popupAvatarForm = document.forms["edit-avatar"];
 const avatarEditButton = document.querySelector(".profile__image-container");
 // let userID = localStorage.getItem("userID");
 let userID = "";
-export const validationConfig = {
+ const validationConfig = {
   formSelector: ".popup__form",
   inputSelector: ".popup__input",
   submitButtonSelector: ".popup__button",
@@ -107,54 +106,26 @@ addCardButton.addEventListener("click", () => {
   linkInput.value = "";
 });
 
-// добавление карточки
-
-Promise.all([getUserInfo(), getInitialCards()]).then(([user, cards]) => {
-  const userID = user._id;
-  cards.forEach((cardData) => {
-    const cardHtml = createCard(
-      cardData,
-      deleteCard,
-      likeClick,
-      handleImageClick,
-      userID
-    );
-    list.append(cardHtml);
-  });
-})
-  .catch((err)=>{            
-  console.log(err);
-   }) 
-// getInitialCards((initialCards, userId) => {
-//   initialCards.forEach((newCard) => {
-//     createCard(newCard, userId, deleteCard, likeClick, handleImageClick);
-//   });
-// });
-
 function handleAddCardFormSubmit(evt) {
   evt.preventDefault();
-  waitLoading(true, popupButton);
+  waitLoading(true, popupAddCard.querySelector(".popup__button"));
   const name = placeNameInput.value;
   const link = linkInput.value;
-  try {
-    addCard({ name, link }).then((newCard) => {
-      createCard(
-        newCard,
-        userID,
-        deleteCard,
-        likeClick,
-        handleImageClick,
-        list.prepend(newCard)
-      );
+
+  addCard({ name, link })
+    .then((newCard) => {
+      const card = createCard(newCard, userID, deleteCard, likeClick, handleImageClick);
+      list.prepend(card);
       closeModal(popupAddCard);
       formAddCard.reset(popupAddCard);
       clearValidation(popupAddCard, validationConfig);
+    })
+    .catch((err) => {
+      console.log(err);
+    })
+    .finally(() => {
+      waitLoading(false, popupAddCard.querySelector(".popup__button"));
     });
-  } catch (err) {
-    console.log(err);
-  } finally {
-    waitLoading(false, popupButton);
-  }
 }
 formAddCard.addEventListener("submit", handleAddCardFormSubmit);
 
@@ -171,18 +142,19 @@ enableValidation(validationConfig);
 // изменение аватара
 function handleEditAvatarFormSubmit(evt) {
   evt.preventDefault();
-  try {
-    waitLoading(true, popupButton);
-    editAvatar(popupAvatarForm.link.value).then((userInfo) => {
+  waitLoading(true, popupAvatarForm.querySelector(".popup__button"));
+  editAvatar(popupAvatarForm.link.value)
+    .then((userInfo) => {
       profileInfo(userInfo);
       closeModal(popupAvatar);
       clearValidation(popupAvatarForm, validationConfig);
+    })
+    .catch((err) => {
+      console.log(err);
+    })
+    .finally(() => {
+      waitLoading(false, popupAvatarForm.querySelector(".popup__button"));
     });
-  } catch (err) {
-    console.log(err);
-  } finally {
-    waitLoading(false, popupButton);
-  }
 }
 popupAvatarForm.addEventListener("submit", handleEditAvatarFormSubmit);
 avatarEditButton.addEventListener("click", (evt) => {
@@ -191,15 +163,37 @@ avatarEditButton.addEventListener("click", (evt) => {
   popupAvatarForm.reset();
 });
 
-// инициализация
-getInitialInfo()
-  .then((result) => {
-    const userInfo = result[0];
-    const userID = userInfo._id;
-    const initialCards = result[1];
-    profileInfo(userInfo);
-    getInitialCards(initialCards, userID);
+  // добавление карточки
+  const initCards = (userID) => {
+    getInitialCards()
+  .then((cards) => {
+    cards.forEach((cardData) => {
+      const cardHtml = createCard(
+        cardData,
+        deleteCard,
+        likeClick,
+        handleImageClick,
+        userID
+      );
+      list.append(cardHtml);
+    });
   })
   .catch((err) => {
     console.log(err);
   });
+  }
+
+// инициализация
+getUserInfo()
+  .then((userInfo) => {
+    const userID = userInfo._id;
+    initCards(userID);
+    // const initialCards = result[1];
+    profileInfo(userInfo);
+    // getInitialCards(initialCards, userID);
+  })
+  .catch((err) => {
+    console.log(err);
+  });
+
+

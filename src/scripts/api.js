@@ -14,10 +14,8 @@ const checkTheResponse = (res) => {
   return Promise.reject(`Error: ${res.status}`);
 };
 
-
-
 // запрос на получение информации о пользователе
- function getUserInfo() {
+function getUserInfo() {
   return fetch(`${configSet.baseUrl}/users/me`, {
     method: "GET",
     headers: configSet.headers,
@@ -29,20 +27,15 @@ const checkTheResponse = (res) => {
 }
 
 // запрос на получение карточек
- function getInitialCards() {
+function getInitialCards() {
   return fetch(`${configSet.baseUrl}/cards`, {
     method: "GET",
     headers: configSet.headers,
-  })
-  .then((res) => checkTheResponse(res));
+  }).then((res) => checkTheResponse(res));
 }
 
-const getInitialInfo = () => {
-    return Promise.all([getUserInfo(), getInitialCards()]);
-  };
-
 //   редактирование профиля
- function editProfile(userProfileData) {
+function editProfile(userProfileData) {
   return fetch(`${configSet.baseUrl}/users/me`, {
     method: "PATCH",
     headers: configSet.headers,
@@ -50,12 +43,11 @@ const getInitialInfo = () => {
       name: userProfileData.name,
       about: userProfileData.about,
     }),
-  })
-    .then((res) => checkTheResponse(res));
+  }).then((res) => checkTheResponse(res));
 }
 
 // добавление карточки
- function addCard(cardData) {
+function addCard(cardData) {
   return fetch(`${configSet.baseUrl}/cards`, {
     method: "POST",
     headers: configSet.headers,
@@ -63,38 +55,34 @@ const getInitialInfo = () => {
       name: cardData.name,
       link: cardData.link,
     }),
-  })
-    .then((res) => checkTheResponse(res));
+  }).then((res) => checkTheResponse(res));
 }
 
 // лайк карточки
- function likeCard(cardId) {
+function likeCard(cardId) {
   return fetch(`${configSet.baseUrl}/cards/${cardId}/likes`, {
     method: "PUT",
     headers: configSet.headers,
-  })
-    .then((res) => checkTheResponse(res));
+  }).then((res) => checkTheResponse(res));
 }
 
 // дизлайк карточки
- function dislikeCard(cardId) {
+function dislikeCard(cardId) {
   return fetch(`${configSet.baseUrl}/cards/${cardId}/likes`, {
     method: "DELETE",
     headers: configSet.headers,
-  })
-    .then((res) => checkTheResponse(res));
+  }).then((res) => checkTheResponse(res));
 }
 
 //   загрузка аватара
- function editAvatar(link) {
+function editAvatar(link) {
   return fetch(`${configSet.baseUrl}/users/me/avatar`, {
     method: "PATCH",
     headers: configSet.headers,
     body: JSON.stringify({
       avatar: link,
     }),
-  })
-    .then((res) => checkTheResponse(res));
+  }).then((res) => checkTheResponse(res));
 }
 
 export {
@@ -102,7 +90,6 @@ export {
   checkTheResponse,
   getUserInfo,
   getInitialCards,
-  getInitialInfo,
   editProfile,
   addCard,
   likeCard,
