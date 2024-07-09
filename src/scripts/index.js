@@ -1,7 +1,7 @@
 import "../pages/index.css";
 import { initialCards } from "./cards.js";
 import { openModal, closeModal, closeEsc } from "./modal.js";
-import { createCard, deleteCard, likeClick } from "./card.js";
+import { createCard } from "./card.js";
 import { enableValidation, clearValidation } from "./validation.js";
 import {
   getUserInfo,
@@ -35,9 +35,9 @@ const popupCaption = document.querySelector(".popup__caption");
 const popupAvatar = document.querySelector(".popup_type_avatar");
 const popupAvatarForm = document.forms["edit-avatar"];
 const avatarEditButton = document.querySelector(".profile__image-container");
-// let userID = localStorage.getItem("userID");
+const cardDeleteButton = document.querySelector(".card__delete-button");
 let userID = "";
- const validationConfig = {
+const validationConfig = {
   formSelector: ".popup__form",
   inputSelector: ".popup__input",
   submitButtonSelector: ".popup__button",
@@ -47,18 +47,21 @@ let userID = "";
 };
 
 // добавим анимации в попап
-if (!document.querySelector(".popup").classList.contains("popup_is-animated")) {
-  document.querySelector(".popup").classList.add("popup_is-animated");
-}
+
+popups.forEach((item) => {
+  item.classList.add("popup_is-animated");
+});
 
 // закрытие попапа через кнопку
 popupCloseButtons.forEach((item) => {
-  item.addEventListener("click", closeModal);
+  const popup = item.closest(".popup");
+  item.addEventListener("click", () => closeModal(popup));
 });
 
 // закрытие попапа через overlay
 popups.forEach((item) => {
-  item.addEventListener("mousedown", closeModal);
+  const popup = item.closest(".popup");
+  item.addEventListener("mousedown", () => closeModal(popup));
 });
 popupContents.forEach((item) => {
   item.addEventListener("mousedown", (evt) => {
@@ -70,6 +73,7 @@ editButton.addEventListener("click", () => {
   (nameInput.value = profileName.textContent),
     (jobInput.value = profileJob.textContent),
     openModal(popupEdit);
+  clearValidation(profileForm, validationConfig);
 });
 // редактирование профиля
 const profileInfo = (userInfo) => {
@@ -83,6 +87,7 @@ const waitLoading = (thisLoading, popupButton) => {
 };
 function handleProfileFormSubmit(evt) {
   evt.preventDefault();
+  const popup = evt.target.closest(".popup");
   waitLoading(true, popupButton);
   editProfile({
     name: profileForm.name.value,
@@ -90,35 +95,38 @@ function handleProfileFormSubmit(evt) {
   })
     .then((userInfo) => {
       profileInfo(userInfo);
-      closeModal(popupEdit);
-      clearValidation(popupEdit, validationConfig);
+      closeModal(popup);
     })
     .finally(() => {
       waitLoading(false, popupButton);
     });
 }
-profileForm.addEventListener("submit", handleProfileFormSubmit);
+profileForm.addEventListener("submit", (evt) => {
+  evt.preventDefault();
+  handleProfileFormSubmit(evt);
+});
 
 // попад добавления карточки
 addCardButton.addEventListener("click", () => {
   openModal(popupAddCard);
+  clearValidation(popupAddCard, validationConfig);
   placeNameInput.value = "";
   linkInput.value = "";
 });
 
 function handleAddCardFormSubmit(evt) {
   evt.preventDefault();
+  const popup = evt.target.closest(".popup");
   waitLoading(true, popupAddCard.querySelector(".popup__button"));
   const name = placeNameInput.value;
   const link = linkInput.value;
-
   addCard({ name, link })
     .then((newCard) => {
-      const card = createCard(newCard, userID, deleteCard, likeClick, handleImageClick);
+      console.log("userID", userID);
+      const card = createCard(newCard, handleImageClick, userID);
       list.prepend(card);
-      closeModal(popupAddCard);
+      closeModal(popup);
       formAddCard.reset(popupAddCard);
-      clearValidation(popupAddCard, validationConfig);
     })
     .catch((err) => {
       console.log(err);
@@ -127,7 +135,10 @@ function handleAddCardFormSubmit(evt) {
       waitLoading(false, popupAddCard.querySelector(".popup__button"));
     });
 }
-formAddCard.addEventListener("submit", handleAddCardFormSubmit);
+formAddCard.addEventListener("submit", (evt) => {
+  evt.preventDefault();
+  handleAddCardFormSubmit(evt);
+});
 
 function handleImageClick(cardData) {
   openModal(popupZoom);
@@ -142,12 +153,12 @@ enableValidation(validationConfig);
 // изменение аватара
 function handleEditAvatarFormSubmit(evt) {
   evt.preventDefault();
+  const popup = evt.target.closest(".popup");
   waitLoading(true, popupAvatarForm.querySelector(".popup__button"));
   editAvatar(popupAvatarForm.link.value)
     .then((userInfo) => {
       profileInfo(userInfo);
-      closeModal(popupAvatar);
-      clearValidation(popupAvatarForm, validationConfig);
+      closeModal(popup);
     })
     .catch((err) => {
       console.log(err);
@@ -156,44 +167,26 @@ function handleEditAvatarFormSubmit(evt) {
       waitLoading(false, popupAvatarForm.querySelector(".popup__button"));
     });
 }
-popupAvatarForm.addEventListener("submit", handleEditAvatarFormSubmit);
+popupAvatarForm.addEventListener("submit", (evt) => {
+  evt.preventDefault();
+  handleEditAvatarFormSubmit(evt);
+});
 avatarEditButton.addEventListener("click", (evt) => {
   evt.preventDefault();
   openModal(popupAvatar);
   popupAvatarForm.reset();
+  clearValidation(popupAvatarForm, validationConfig);
 });
 
-  // добавление карточки
-  const initCards = (userID) => {
-    getInitialCards()
-  .then((cards) => {
+Promise.all([getUserInfo(), getInitialCards()])
+  .then(([userInfo, cards]) => {
+    userID = userInfo._id;
+    profileInfo(userInfo);
     cards.forEach((cardData) => {
-      const cardHtml = createCard(
-        cardData,
-        deleteCard,
-        likeClick,
-        handleImageClick,
-        userID
-      );
+      const cardHtml = createCard(cardData, handleImageClick, userID);
       list.append(cardHtml);
     });
   })
   .catch((err) => {
     console.log(err);
   });
-  }
-
-// инициализация
-getUserInfo()
-  .then((userInfo) => {
-    const userID = userInfo._id;
-    initCards(userID);
-    // const initialCards = result[1];
-    profileInfo(userInfo);
-    // getInitialCards(initialCards, userID);
-  })
-  .catch((err) => {
-    console.log(err);
-  });
-
-

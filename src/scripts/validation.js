@@ -34,14 +34,10 @@ const checkInputValidity = (formElement, inputElement, validationConfig) => {
   }
 };
 
-  function toggleButton(formElement, buttonElement, validationConfig) {
-    const inputList = Array.from(
-      formElement.querySelectorAll(validationConfig.inputSelector)
-    );
+  function toggleButton(inputList, buttonElement, validationConfig) {
     const hasInvalid = inputList.some(
       (inputElement) => !inputElement.validity.valid
     );
-  
     if (hasInvalid) {
       buttonElement.classList.add(validationConfig.inactiveButtonClass);
       buttonElement.setAttribute("disabled", true);
@@ -62,7 +58,7 @@ function setEventListeners(formElement, validationConfig) {
   inputList.forEach((inputElement) => {
     inputElement.addEventListener("input", (evt) => {
       checkInputValidity(formElement, inputElement, validationConfig);
-      toggleButton(formElement, buttonElement, validationConfig);
+      toggleButton(inputList, buttonElement, validationConfig);
     });
   });
 }
@@ -71,9 +67,6 @@ function enableValidation(validationConfig) {
     document.querySelectorAll(validationConfig.formSelector)
   );
   formList.forEach((formElement) => {
-    formElement.addEventListener("submit", (evt) => {
-      evt.preventDefault();
-    });
     setEventListeners(formElement, validationConfig);
   });
 }
@@ -85,12 +78,10 @@ function clearValidation(formElement, validationConfig) {
   const buttonElement = formElement.querySelector(
     validationConfig.submitButtonSelector
   );
-  buttonElement.classList.add(validationConfig.inactiveButtonClass);
   inputList.forEach((inputElement) => {
     hideError(formElement, inputElement, validationConfig);
-    // inputElement.value = "";
   });
-  toggleButton(formElement, buttonElement, validationConfig);
+  toggleButton(inputList, buttonElement, validationConfig);
 }
 
 export { enableValidation, clearValidation };

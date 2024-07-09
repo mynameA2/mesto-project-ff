@@ -21,9 +21,6 @@ function getUserInfo() {
     headers: configSet.headers,
   })
     .then((res) => checkTheResponse(res))
-    .catch((err) => {
-      console.log(err);
-    });
 }
 
 // запрос на получение карточек
@@ -55,6 +52,14 @@ function addCard(cardData) {
       name: cardData.name,
       link: cardData.link,
     }),
+  }).then((res) => checkTheResponse(res));
+}
+
+// удаление карточки
+function deleteCardFromServer(cardId) {
+  return fetch(`${configSet.baseUrl}/cards/${cardId}`, {
+    method: "DELETE",
+    headers: configSet.headers,
   }).then((res) => checkTheResponse(res));
 }
 
@@ -92,6 +97,7 @@ export {
   getInitialCards,
   editProfile,
   addCard,
+  deleteCardFromServer,
   likeCard,
   dislikeCard,
   editAvatar,
