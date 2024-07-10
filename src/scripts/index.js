@@ -54,14 +54,12 @@ popups.forEach((item) => {
 
 // закрытие попапа через кнопку
 popupCloseButtons.forEach((item) => {
-  const popup = item.closest(".popup");
-  item.addEventListener("click", () => closeModal(popup));
+  item.addEventListener("click", () => closeModal(item));
 });
 
 // закрытие попапа через overlay
 popups.forEach((item) => {
-  const popup = item.closest(".popup");
-  item.addEventListener("mousedown", () => closeModal(popup));
+  item.addEventListener("mousedown", () => closeModal(item));
 });
 popupContents.forEach((item) => {
   item.addEventListener("mousedown", (evt) => {
@@ -109,9 +107,9 @@ profileForm.addEventListener("submit", (evt) => {
 // попад добавления карточки
 addCardButton.addEventListener("click", () => {
   openModal(popupAddCard);
-  clearValidation(popupAddCard, validationConfig);
   placeNameInput.value = "";
   linkInput.value = "";
+  clearValidation(popupAddCard, validationConfig);
 });
 
 function handleAddCardFormSubmit(evt) {

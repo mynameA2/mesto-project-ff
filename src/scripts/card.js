@@ -54,7 +54,11 @@ function createCard(
     } else {
       cardDeleteButton.addEventListener("click", () => {
       const cardId = cardData._id;
-      deleteCardFromServer(cardId);
+      deleteCardFromServer(cardId)
+        .then(() => {
+          cardHtml.remove();
+        })
+        .catch((err) => console.log(err));
     });
   }
 
@@ -65,9 +69,6 @@ function createCard(
     likeClick(likeButton, cardId, likeCounter);
   });
 
-  cardHtml
-    .querySelector(".card__delete-button")
-    .addEventListener("click", () => cardHtml.remove());
   return cardHtml;
 }
 
